@@ -8,6 +8,7 @@ import (
     "github.com/google/gopacket/pcap" // Import the pcap package to capture packets.
     "github.com/google/gopacket" // Import the gopacket package to decode packets.
     "github.com/google/gopacket/layers" // Import the layers package to access the various network layers.
+	"net"
 )
 
 func main() {
@@ -28,23 +29,29 @@ func main() {
     packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
     for packet := range packetSource.Packets() {
 
-        // Print the packet details
-        fmt.Println(packet.String())
+		var src_mac, dst_mac net.HardwareAddr
+		var src_ip,  dst_ip net.IP
 
         // Extract and print the Ethernet layer
         ethLayer := packet.Layer(layers.LayerTypeEthernet)
         if ethLayer != nil {
             ethPacket, _ := ethLayer.(*layers.Ethernet)
-            fmt.Println("Ethernet source MAC address:", ethPacket.SrcMAC)
-            fmt.Println("Ethernet destination MAC address:", ethPacket.DstMAC)
+            src_mac = ethPacket.SrcMAC
+            dst_mac = ethPacket.DstMAC
         }
 
         // Extract and print the IP layer
         ipLayer := packet.Layer(layers.LayerTypeIPv4)
         if ipLayer != nil {
             ipPacket, _ := ipLayer.(*layers.IPv4)
-            fmt.Println("IP source address:", ipPacket.SrcIP)
-            fmt.Println("IP destination address:", ipPacket.DstIP)
+            src_ip = ipPacket.SrcIP
+            dst_ip = ipPacket.DstIP			
         }
+
+		fmt.Printf("Src<%s>[%s] -> Dst<%s>[%s]\n", src_ip, src_mac, dst_ip, dst_mac )
+        // Print the packet details
+        //fmt.Println(packet.String())
+
+
     }
 }
