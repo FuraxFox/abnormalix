@@ -28,7 +28,7 @@ func main() {
 
 	var profile abnormalix.NetworkProfile
 	var MACsMetric abnormalix.L2ComMetricCounter //TODO
-	profile.RegisterMetric(MACsMetric)
+	profile.RegisterMetric(&MACsMetric)
 
 	// Loop through packets in file
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())

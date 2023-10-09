@@ -12,7 +12,7 @@ import (
 )
 
 type NetworkProfileMetric interface {
-	Differs(m *NetworkProfileMetric) (string, bool)
+	//	Differs(m *NetworkProfileMetric) (string, bool)
 	Update(p *gopacket.Packet)
 	Dump() string
 }
@@ -22,7 +22,7 @@ type PacketCounter struct {
 	SizeTotal    int
 }
 
-func (c *PacketCounter) Update(p *gopacket.Packet) {
+func (c *PacketCounter) Update(p gopacket.Packet) {
 	c.PacketsCount++
 	data := p.Data()
 	c.SizeTotal += binary.Size(data)
@@ -56,15 +56,17 @@ func (m *L2ComMetricCounter) Update(p gopacket.Packet) {
 	m.counter.Update(p)
 }
 
+/*
 func (m *L2ComMetricCounter) Differs(m2 *NetworkProfileMetric) (string, bool) {
 	// TODO
 	return "", false
 }
+*/
 
 func (m *L2ComMetricCounter) Dump() string {
 	var dump string
 	dump += "L2ComMetricCounter:"
-	for src, _ := range m.history {
+	for src := range m.history {
 		dump += "<" + src + " =>" + ""
 	}
 	return dump
@@ -75,6 +77,6 @@ type NetworkProfile struct {
 	Metrics []NetworkProfileMetric
 }
 
-func (p *NetworkProfile) RegisterMetric(m NetworkProfileMetric) {
-	p.Metrics = append(p.Metrics, m)
+func (p *NetworkProfile) RegisterMetric(m *NetworkProfileMetric) {
+	(*p).Metrics = append((*p).Metrics, m)
 }
